@@ -69,9 +69,9 @@ Although Bash does not natively support JPath, it can be implemented using exter
 Consider a JSON file named `data.json`:
 ```json
 {
-  "name": "John Doe",
-  "age": 30,
-  "city": "New York",
+  "name": "Reza Heydari",
+  "age": 38,
+  "city": "Salzburg",
   "pets": [
     {
       "name": "Fluffy",
@@ -91,7 +91,7 @@ echo "Name: $name"
 ```
 Output:
 ```
-Name: John Doe
+Name: Reza Heydari
 ```
 
 
