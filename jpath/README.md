@@ -323,3 +323,62 @@ k8s-playground-worker          amd64
 Here, the "NODE" column displays the node names, while the "Architecture" column specifies the architecture (e.g., amd64) of each node.
 
 Custom columns offer a flexible way to extract specific details from your Kubernetes cluster, enabling better monitoring and management.
+
+
+
+**Custom Columns and Sort By**
+
+Below is a command using `kubectl` to retrieve PersistentVolumes (PVs), sorting them by storage capacity and displaying custom columns.
+
+```bash
+kubectl get pv --sort-by=.spec.capacity.storage -o custom-columns=NAME:.metadata.name,CAPACITY:.spec.capacity.storage
+```
+
+**Explanation:**
+
+- `kubectl get pv`: This command retrieves information about PersistentVolumes.
+- `--sort-by=.spec.capacity.storage`: This option sorts the output based on the storage capacity specified in the PV's specification.
+- `-o custom-columns=NAME:.metadata.name,CAPACITY:.spec.capacity.storage`: This option formats the output in a custom columnar format. It displays the name of each PV under the column "NAME" and its storage capacity under the column "CAPACITY".
+
+
+**Custom Columns and Filtering**
+ 
+```bash
+ kubectl get -n devops-app secrets $(kubectl get secrets -n devops-app -o=jsonpath='{range .items[?(@.type=="kubernetes.io/dockerconfigjson")]}{.metadata.name}{"\n"}{end}') -o=jsonpath='{.data.\.dockerconfigjson}' | base64 --decode |   jq -r '.. | objects | select(has("auth")) | .auth' | base64 --decod
+```
+ 
+
+### Overview:
+
+This command retrieves Docker registry authentication credentials stored as a Kubernetes secret in the `devops-app` namespace, decodes and extracts the necessary information, and finally decodes the base64 encoded output to reveal the authentication details.
+
+---
+
+### Command Breakdown:
+
+1. `kubectl get -n devops-app secrets`
+
+   - Retrieves secrets from the `devops-app` namespace.
+
+2. `$(kubectl get secrets -n devops-app -o=jsonpath='{range .items[?(@.type=="kubernetes.io/dockerconfigjson")]}{.metadata.name}{"\n"}{end}')`
+
+   - Executes a nested `kubectl get` command to filter secrets based on type (`kubernetes.io/dockerconfigjson`) and extract their names using `jsonpath`.
+
+3. `-o=jsonpath='{.data.\.dockerconfigjson}'`
+
+   - Uses `jsonpath` to extract the base64 encoded Docker configuration JSON data from the retrieved secrets.
+
+4. `| base64 --decode`
+
+   - Decodes the base64 encoded Docker configuration JSON data.
+
+5. `| jq -r '.. | objects | select(has("auth")) | .auth'`
+
+   - Uses `jq` to parse the JSON and filter out objects containing the `auth` key.
+
+6. `| base64 --decod`
+
+   - Decodes the base64 encoded `auth` field to reveal the Docker registry authentication details.
+
+Ensure you have  `jq` installed . Replace `devops-app` with your desired namespace if you are working in a different namespace.
+ 
